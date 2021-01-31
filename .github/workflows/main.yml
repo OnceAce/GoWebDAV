@@ -1,1 +1,24 @@
-asd
+name: CI Build python alpine 3.7
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image-name: [python]
+        image-version: [3.7-alpine-django]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: docker build and push aliyun
+      env:
+        aliyun_username: ${{ secrets.Aliyun_Username }}
+        aliyun_password: ${{ secrets.Aliyun_Password }}
+      run: |
+        sudo docker login --username=${aliyun_username} registry.cn-beijing.aliyuncs.com --password=${{ secrets.aliyun_password }}
+        sudo docker build -t ${{ matrix.image-name }}:${{ matrix.image-version }} .
+        sudo docker tag ${{ matrix.image-name }}:${{ matrix.image-version }} registry.cn-beijing.aliyuncs.com/命名空间/镜像仓库:${{ matrix.image-version }}
+        sudo docker push registry.cn-beijing.aliyuncs.com/命名空间/镜像仓库:${{ matrix.image-version }}
