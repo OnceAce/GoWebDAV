@@ -3,6 +3,12 @@ name: Build GoWebDAV
 on:
   repository_dispatch:
     types: [x86_64, x86]
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
   schedule:
     - cron: 0 16 * * *
