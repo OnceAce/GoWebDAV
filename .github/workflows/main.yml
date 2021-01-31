@@ -39,7 +39,18 @@ jobs:
         
       - name: Push Docker Image To Aliyun Shanghai Registry
         if: steps.build.outputs.status == 'success' && env.UPLOAD_Ali_SH == 'true' && !cancelled()
+        timeout-minutes: 60
+        continue-on-error: true
         run: |
           docker login -u ${{ secrets.ALIYUN_USERNAME }} -p ${{ secrets.ALIYUN_PWD }} registry.cn-shanghai.aliyuncs.com
           sudo docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }} registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
           sudo docker push registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
+
+      - name: Push Docker Image To Aliyun Shenzhen Registry
+        if: steps.build.outputs.status == 'success' && env.UPLOAD_Ali_SZ == 'true' && !cancelled()
+        timeout-minutes: 60
+        continue-on-error: true
+        run: |
+          docker login -u ${{ secrets.ALIYUN_USERNAME }} -p ${{ secrets.ALIYUN_PWD }} registry.cn-shenzhen.aliyuncs.com
+          sudo docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }} registry.cn-shenzhen.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
+          sudo docker push registry.cn-shenzhen.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
