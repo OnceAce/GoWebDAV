@@ -36,7 +36,7 @@ jobs:
         if: steps.build.outputs.status == 'success' && env.UPLOAD_HUB_DOCKER == 'true' && !cancelled()
         run: |
           cd $IMAGE
-          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PWD }}
+          sudo docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PWD }}
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
         
       - name: Push Docker Image To Aliyun Shanghai Registry
@@ -44,5 +44,5 @@ jobs:
         run: |
           cd $IMAGE
           docker login -u ${{ secrets.ALIYUN_USERNAME }} -p ${{ secrets.ALIYUN_PWD }} registry.cn-shanghai.aliyuncs.com
-          docker tag ${{ matrix.image-name }}:${{ matrix.image-version }} registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
+          sudo docker tag ${{ matrix.image-name }}:${{ matrix.image-version }} registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
           docker push registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
