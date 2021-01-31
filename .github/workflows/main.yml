@@ -28,7 +28,7 @@ jobs:
       - name: Docker Build
         id: build
         run: |
-          docker build -t ${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }} .
+          sudo docker build -t ${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }} .
           echo "IMAGE=$PWD" >> $GITHUB_ENV
           echo "::set-output name=status::success"
         
@@ -36,13 +36,13 @@ jobs:
         if: steps.build.outputs.status == 'success' && env.UPLOAD_HUB_DOCKER == 'true' && !cancelled()
         run: |
           cd $IMAGE
-          sudo docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PWD }}
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
+          docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PWD }}
+          sudo docker push ${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
         
       - name: Push Docker Image To Aliyun Shanghai Registry
         if: steps.build.outputs.status == 'success' && env.UPLOAD_Ali_SH == 'true' && !cancelled()
         run: |
           cd $IMAGE
           docker login -u ${{ secrets.ALIYUN_USERNAME }} -p ${{ secrets.ALIYUN_PWD }} registry.cn-shanghai.aliyuncs.com
-          sudo docker tag ${{ matrix.image-name }}:${{ matrix.image-version }} registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
-          docker push registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
+          sudo docker tag ${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }} registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
+          sudo docker push registry.cn-shanghai.aliyuncs.com/${{ secrets.ALIYUN_NAMESPACES }}/${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }}
