@@ -29,6 +29,7 @@ jobs:
         id: build
         run: |
           docker build -t ${{ matrix.image-name }}:${{ matrix.image-version }} .
+          echo "::set-output name=status::success"
         
       - name: Docker Build and Push Docker Hub
         if: steps.organized.outputs.status == 'success' && env.UPLOAD_HUB_DOCKER == 'true' && !cancelled()
