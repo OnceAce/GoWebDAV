@@ -4,10 +4,10 @@ on:
   repository_dispatch:
     types: [x86_64, x86]
   workflow_dispatch:
-#  schedule:
-#    - cron: 0 16 * * *
-  watch:
-    types: started
+  schedule:
+    - cron: 0 16 * * *
+#  watch:
+#    types: started
     
 env:
   UPLOAD_HUB_DOCKER: true
