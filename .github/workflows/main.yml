@@ -1,4 +1,4 @@
-name: CI Build python alpine 3.7
+name: Build Dockerfile alpine 3.7
 
 on: [push]
 
