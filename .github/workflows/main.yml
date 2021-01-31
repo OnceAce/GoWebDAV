@@ -28,7 +28,7 @@ jobs:
       - name: Docker Build
         id: build
         run: |
-          docker build -t ${{ matrix.image-name }}:${{ matrix.image-version }} .
+          docker build -t ${{ env.IMAGE-NAME }}:${{ env.IMAGE-VERSION }} .
           echo "::set-output name=status::success"
         
       - name: Docker Build and Push Docker Hub
