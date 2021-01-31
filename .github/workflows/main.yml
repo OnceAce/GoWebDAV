@@ -1,6 +1,13 @@
 name: Build Dockerfile alpine 3.7
 
-on: [push]
+on:
+  repository_dispatch:
+    types: [x86_64, x86]
+  workflow_dispatch:
+#  schedule:
+#    - cron: 0 16 * * *
+  watch:
+    types: started
 
 jobs:
   build:
