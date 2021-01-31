@@ -1,4 +1,4 @@
-name: Build Dockerfile alpine 3.7
+name: Build GoWebDAV
 
 on:
   repository_dispatch:
@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,9 +20,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: docker build and push aliyun
-      env:
-        aliyun_username: ${{ secrets.Aliyun_Username }}
-        aliyun_password: ${{ secrets.Aliyun_Password }}
       run: |
         sudo docker login --username=${aliyun_username} registry.cn-beijing.aliyuncs.com --password=${{ secrets.aliyun_password }}
         sudo docker build -t ${{ matrix.image-name }}:${{ matrix.image-version }} .
