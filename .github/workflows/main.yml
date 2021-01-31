@@ -8,20 +8,38 @@ on:
 #    - cron: 0 16 * * *
   watch:
     types: started
+    
+env:
+  UPLOAD_HUB_DOCKER: true
+  UPLOAD_Ali_SH: true
+  UPLOAD_Ali_SZ: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image-name: [python]
-        image-version: [3.7-alpine-django]
+        image-name: [gowebdav]
+        image-version: [latest]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: docker build and push aliyun
+    - name: Checkout
+    - uses: actions/checkout@main
+      
+    - name: Docker Build
+      id: build
       run: |
-        sudo docker login --username=${aliyun_username} registry.cn-beijing.aliyuncs.com --password=${{ secrets.aliyun_password }}
-        sudo docker build -t ${{ matrix.image-name }}:${{ matrix.image-version }} .
-        sudo docker tag ${{ matrix.image-name }}:${{ matrix.image-version }} registry.cn-beijing.aliyuncs.com/命名空间/镜像仓库:${{ matrix.image-version }}
-        sudo docker push registry.cn-beijing.aliyuncs.com/命名空间/镜像仓库:${{ matrix.image-version }}
+        docker build -t ${{ matrix.image-name }}:${{ matrix.image-version }} .
+        
+    - name: Docker Build and Push Docker Hub
+      if: steps.organized.outputs.status == 'success' && env.UPLOAD_HUB_DOCKER == 'true' && !cancelled()
+      run: |
+        docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PWD }}
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ matrix.image-name }}:${{ matrix.image-version }}
+        
+    - name: Push Docker Image To Aliyun Shanghai Registry
+      if: steps.organized.outputs.status == 'success' && env.UPLOAD_Ali_SH == 'true' && !cancelled()
+      run: |
+        docker login -u ${{ secrets.ALIYUN_USERNAME }} -p ${{ secrets.ALIYUN_PWD }} registry.cn-shanghai.aliyuncs.com
+        docker tag ${{ matrix.image-name }}:${{ matrix.image-version }} registry.cn-shanghai.aliyuncs.com/onceace/${{ matrix.image-name }}:${{ matrix.image-version }}
+        docker push registry.cn-beijing.aliyuncs.com/onceace/${{ matrix.image-name }}:${{ matrix.image-version }}
