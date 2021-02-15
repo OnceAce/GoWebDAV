@@ -33,6 +33,7 @@ func (c *Config) Load() {
 	viper.SetConfigType("yaml")             //设置配置文件类型
 	viper.AddConfigPath(".")                //添加配置文件所在的路径
 	viper.SetConfigName("config")           //设置配置文件的名字
+	
 	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
 }
 
