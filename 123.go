@@ -44,7 +44,6 @@ var AppConfig *Config = &Config{}
 
 func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
 	ctx := context.Background()
-
 	path := req.URL.Path
 	path = strings.Replace(path, prefix, "/", 1)
 
@@ -52,16 +51,13 @@ func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Reques
 	if err != nil {
 		return false
 	}
+	
 	defer f.Close()
-
 	if fi, _ := f.Stat(); fi != nil && !fi.IsDir() {
-
 		return false
-
 	}
 
 	dirs, err := f.Readdir(-1)
-
 	if err != nil {
 		log.Print(w, "Error reading directory", http.StatusInternalServerError)
 		return false
