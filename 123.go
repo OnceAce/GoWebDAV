@@ -1,9 +1,17 @@
 package main
 
 import (
+	"GoWebdav/model"
 	"fmt"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"golang.org/x/net/context"
+	"golang.org/x/net/webdav"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 )
 
 type Config struct {
@@ -29,20 +37,7 @@ var AppConfig *Config = &Config{}
 
 
 
-package main
 
-import (
-	"GoWebdav/model"
-	"fmt"
-	"github.com/spf13/viper"
-	"golang.org/x/net/context"
-	"golang.org/x/net/webdav"
-	"log"
-	"net/http"
-	"net/url"
-	"os"
-	"strings"
-)
 
 func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
 	ctx := context.Background()
