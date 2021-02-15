@@ -31,6 +31,9 @@ func (config *Config) Load() {
 		fmt.Println(err)
 	}
 	config.dav = viper.GetString("dav")
+	viper.SetConfigType("yaml")             //设置配置文件类型
+	viper.AddConfigPath(".")                //添加配置文件所在的路径
+	viper.SetConfigName("config")           //设置配置文件的名字
 }
 
 var AppConfig *Config = &Config{}
@@ -90,10 +93,6 @@ func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Reques
 
 }
 func main() {
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
-
 	AppConfig.Load()
 	fmt.Print("AppConfig.dav ")
 	fmt.Println(AppConfig.dav)
