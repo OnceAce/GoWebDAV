@@ -18,7 +18,7 @@ type Config struct {
 	dav string
 }
 
-func (config *Config) Load() {
+func (c *Config) Load() {
 	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
 	pflag.Parse()
 
@@ -30,7 +30,7 @@ func (config *Config) Load() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	config.dav = viper.GetString("dav")
+	c.dav = viper.GetString("dav")
 	viper.SetConfigType("yaml")             //设置配置文件类型
 	viper.AddConfigPath(".")                //添加配置文件所在的路径
 	viper.SetConfigName("config")           //设置配置文件的名字
