@@ -1,7 +1,6 @@
 package main
 
 import (
-	"GoWebdav/model"
 	"fmt"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
