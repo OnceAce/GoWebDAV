@@ -74,12 +74,12 @@ func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *
 
 func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 	davConfigArray := strings.Split(str, ",")
-	WebDAVConfig.prefix := davConfigArray[0]
-	WebDAVConfig.pathDir := davConfigArray[1]
-	WebDAVConfig.username := davConfigArray[2]
-	WebDAVConfig.password := davConfigArray[3]
+	WebDAVConfig.prefix = davConfigArray[0]
+	WebDAVConfig.pathDir = davConfigArray[1]
+	WebDAVConfig.username = davConfigArray[2]
+	WebDAVConfig.password = davConfigArray[3]
 
-	WebDAVConfig.readonly, err := strconv.ParseBool(davConfigArray[4])
+	WebDAVConfig.readonly, err = strconv.ParseBool(davConfigArray[4])
 	if err != nil {
 		WebDAVConfig.readonly = false
 	}
@@ -87,7 +87,7 @@ func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 	WebDAVConfig.Handler = &webdav.Handler{
 		FileSystem: webdav.Dir(pathDir),
 		LockSystem: webdav.NewMemLS(),
-		Prefix:     WebDAVConfig.prefix,
+		Prefix:     davConfigArray[0],
 	}
 }
 
