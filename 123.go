@@ -15,6 +15,32 @@ import (
 	"strconv"
 )
 
+type Config struct {
+	dav string
+}
+
+func (c *Config) Load() {
+	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
+	pflag.Parse()
+
+	err := viper.BindPFlags(pflag.CommandLine)    //从pflag检索“命令行”并处理错误
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = viper.ReadInConfig()
+	if err != nil {
+		fmt.Println(err)
+	}
+	viper.SetConfigType("yaml")             //设置配置文件类型
+	viper.AddConfigPath(".")                //添加配置文件所在的路径
+	viper.SetConfigName("config")           //设置配置文件的名字
+	
+	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
+}
+
+var AppConfig *Config = &Config{}
+
+
 type WebDAVConfig struct {
 	Prefix   string
 	PathDir  string
@@ -59,39 +85,6 @@ func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *
 	}
 	return nil
 }
-
-
-
-
-
-
-type Config struct {
-	dav string
-}
-
-func (c *Config) Load() {
-	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
-	pflag.Parse()
-
-	err := viper.BindPFlags(pflag.CommandLine)    //从pflag检索“命令行”并处理错误
-	if err != nil {
-		fmt.Println(err)
-	}
-	err = viper.ReadInConfig()
-	if err != nil {
-		fmt.Println(err)
-	}
-	viper.SetConfigType("yaml")             //设置配置文件类型
-	viper.AddConfigPath(".")                //添加配置文件所在的路径
-	viper.SetConfigName("config")           //设置配置文件的名字
-	
-	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
-}
-
-var AppConfig *Config = &Config{}
-
-
-
 
 
 func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
