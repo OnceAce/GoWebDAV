@@ -72,33 +72,23 @@ func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *
 }
 
 
-func (WebDAVConfig *WebDAVConfig) Init(prefix string, pathDir string, username string, password string, readonly bool) {
-	WebDAVConfig.Prefix = prefix
-	WebDAVConfig.PathDir = pathDir
-	WebDAVConfig.Username = username
-	WebDAVConfig.Password = password
-	WebDAVConfig.ReadOnly = readonly
+func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
+	davConfigArray := strings.Split(str, ",")
+	WebDAVConfig.prefix := davConfigArray[0]
+	WebDAVConfig.pathDir := davConfigArray[1]
+	WebDAVConfig.username := davConfigArray[2]
+	WebDAVConfig.password := davConfigArray[3]
+
+	WebDAVConfig.readonly, err := strconv.ParseBool(davConfigArray[4])
+	if err != nil {
+		WebDAVConfig.readonly = false
+	}
+
 	WebDAVConfig.Handler = &webdav.Handler{
 		FileSystem: webdav.Dir(pathDir),
 		LockSystem: webdav.NewMemLS(),
-		Prefix:     prefix,
+		Prefix:     davConfigArray[0],
 	}
-}
-
-
-func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
-	davConfigArray := strings.Split(str, ",")
-	prefix := davConfigArray[0]
-	pathDir := davConfigArray[1]
-	username := davConfigArray[2]
-	password := davConfigArray[3]
-
-	readonly, err := strconv.ParseBool(davConfigArray[4])
-	if err != nil {
-		readonly = false
-	}
-
-	WebDAVConfig.Init(prefix, pathDir, username, password, readonly)
 }
 
 
