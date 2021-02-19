@@ -35,10 +35,22 @@ func (c *Config) Load() {
 	viper.SetConfigName("config")           //设置配置文件的名字
 	
 	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
+	davConfigs := strings.Split(c.dav, ";")
 }
 
 var AppConfig *Config = &Config{}
 
+AppConfig.Load()
+fmt.Print("AppConfig.dav ")
+fmt.Println(AppConfig.dav)
+
+WebDAVConfigs := make([]*model.WebDAVConfig, 0)
+
+for _, davConfig := range davConfigs {
+	WebDAVConfig := &model.WebDAVConfig{}
+	WebDAVConfig.InitByConfigStr(davConfig)
+	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
+}
 
 type WebDAVConfig struct {
 	Prefix   string
@@ -133,19 +145,6 @@ func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Reques
 
 }
 func main() {
-	AppConfig.Load()
-	fmt.Print("AppConfig.dav ")
-	fmt.Println(AppConfig.dav)
-	davConfigs := strings.Split(AppConfig.dav, ";")
-
-	WebDAVConfigs := make([]*model.WebDAVConfig, 0)
-
-	for _, davConfig := range davConfigs {
-		WebDAVConfig := &model.WebDAVConfig{}
-		WebDAVConfig.InitByConfigStr(davConfig)
-		WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
-	}
-
 	sMux := http.NewServeMux()
 	sMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 
