@@ -144,9 +144,9 @@ func main() {
 	sMux := http.NewServeMux()
 	sMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 
-		webDAVConfig := WebDAVConfigFindOneByPrefix(WebDAVConfigs, parsePrefixFromURL(req.URL))
+		webDAVConfigure := WebDAVConfigFindOneByPrefix(WebDAVConfigs, parsePrefixFromURL(req.URL))
 
-		if webDAVConfig == nil {
+		if webDAVConfigure == nil {
 
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -172,7 +172,7 @@ func main() {
 			return
 		}
 
-		if webDAVConfig.Username != "null" && webDAVConfig.Password != "null" {
+		if webDAVConfigure.Username != "null" && webDAVConfigure.Password != "null" {
 			// 配置中的 用户名 密码 都为 null 时 不进行身份检查
 			// 不都为 null 进行身份检查
 
@@ -189,13 +189,13 @@ func main() {
 				return
 			}
 
-			if username != webDAVConfig.Username || password != webDAVConfig.Password {
+			if username != webDAVConfigure.Username || password != webDAVConfigure.Password {
 				http.Error(w, "username wrong or password wrong", http.StatusUnauthorized)
 				return
 			}
 		}
 
-		if webDAVConfig.ReadOnly && req.Method != "GET" && req.Method != "OPTIONS" {
+		if webDAVConfigure.ReadOnly && req.Method != "GET" && req.Method != "OPTIONS" {
 			// ReadOnly
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			_, _ = w.Write([]byte("Readonly, Method " + req.Method + " Not Allowed"))
@@ -203,12 +203,12 @@ func main() {
 		}
 
 		// show files of directory
-		if req.Method == "GET" && handleDirList(webDAVConfig.Handler.FileSystem, w, req, webDAVConfig.Handler.Prefix) {
+		if req.Method == "GET" && handleDirList(webDAVConfigure.Handler.FileSystem, w, req, webDAVConfigure.Handler.Prefix) {
 			return
 		}
 
 		// handle file
-		webDAVConfig.Handler.ServeHTTP(w, req)
+		webDAVConfigure.Handler.ServeHTTP(w, req)
 	})
 
 	err := http.ListenAndServe(":80", sMux)
