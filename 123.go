@@ -31,7 +31,7 @@ func (c *Config) Load() {
 	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
 	pflag.Parse()
 
-	err := viper.BindPFlags(pflag.CommandLine)    //从pflag检索“命令行”并处理错误
+	err := viper.BindPFlags(pflag.CommandLine)                 //从pflag检索“命令行”并处理错误
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -39,19 +39,19 @@ func (c *Config) Load() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	viper.SetConfigType("yaml")             //设置配置文件类型
-	viper.AddConfigPath(".")                //添加配置文件所在的路径
-	viper.SetConfigName("config")           //设置配置文件的名字
+	viper.SetConfigType("yaml")                                //设置配置文件类型
+	viper.AddConfigPath(".")                                   //添加配置文件所在的路径
+	viper.SetConfigName("config")                              //设置配置文件的名字
 	
-	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
+	c.dav = viper.GetString("dav")                             //通过viper从pflag中获取值
 	davConfigs := strings.Split(c.dav, ";")
 	
-	WebDAVConfigs := make([]*WebDAVConfig, 0)
+	WebDAVConfigs := make([]*WebDAVConfig, 0)                  //创建上述格式的结构体
 	
-	for _, davConfig := range davConfigs {
-	WebDAVConfig := &model.WebDAVConfig{}
-	WebDAVConfig.InitByConfigStr(davConfig)
-	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
+	for _, davConfig := range davConfigs {                     //通过循环davConfig导出每个用户配置 
+	WebDAVConfigcopy := &WebDAVConfig{}                            
+	WebDAVConfigcopy.InitByConfigStr(davConfig)
+	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfigcopy)
 	}
 }
 
