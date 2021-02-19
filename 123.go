@@ -18,40 +18,6 @@ type Config struct {
 	dav string
 }
 
-func (c *Config) Load() {
-	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
-	pflag.Parse()
-
-	err := viper.BindPFlags(pflag.CommandLine)    //从pflag检索“命令行”并处理错误
-	if err != nil {
-		fmt.Println(err)
-	}
-	err = viper.ReadInConfig()
-	if err != nil {
-		fmt.Println(err)
-	}
-	viper.SetConfigType("yaml")             //设置配置文件类型
-	viper.AddConfigPath(".")                //添加配置文件所在的路径
-	viper.SetConfigName("config")           //设置配置文件的名字
-	
-	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
-	davConfigs := strings.Split(c.dav, ";")
-}
-
-var AppConfig *Config = &Config{}
-
-AppConfig.Load()
-fmt.Print("AppConfig.dav ")
-fmt.Println(AppConfig.dav)
-
-WebDAVConfigs := make([]*model.WebDAVConfig, 0)
-
-for _, davConfig := range davConfigs {
-	WebDAVConfig := &model.WebDAVConfig{}
-	WebDAVConfig.InitByConfigStr(davConfig)
-	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
-}
-
 type WebDAVConfig struct {
 	Prefix   string
 	PathDir  string
@@ -88,6 +54,43 @@ func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 
 	WebDAVConfig.Init(prefix, pathDir, username, password, readonly)
 }
+
+
+func (c *Config) Load() {
+	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
+	pflag.Parse()
+
+	err := viper.BindPFlags(pflag.CommandLine)    //从pflag检索“命令行”并处理错误
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = viper.ReadInConfig()
+	if err != nil {
+		fmt.Println(err)
+	}
+	viper.SetConfigType("yaml")             //设置配置文件类型
+	viper.AddConfigPath(".")                //添加配置文件所在的路径
+	viper.SetConfigName("config")           //设置配置文件的名字
+	
+	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
+	davConfigs := strings.Split(c.dav, ";")
+}
+
+var AppConfig *Config = &Config{}
+
+AppConfig.Load()
+fmt.Print("AppConfig.dav ")
+fmt.Println(AppConfig.dav)
+
+WebDAVConfigs := make([]*model.WebDAVConfig, 0)
+
+for _, davConfig := range davConfigs {
+	WebDAVConfig := &model.WebDAVConfig{}
+	WebDAVConfig.InitByConfigStr(davConfig)
+	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
+}
+
+
 func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *WebDAVConfig {
 	for _, WebDAVConfig := range WebDAVConfigs {
 		if WebDAVConfig.Prefix == prefix {
