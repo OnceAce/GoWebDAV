@@ -4,8 +4,8 @@ on:
 #  repository_dispatch:
 #    types: [x86_64, x86]
   workflow_dispatch:
-  schedule:
-    - cron: 0 * 1 * *
+#  schedule:
+#    - cron: 0 * 1 * *
 #  watch:
 #    types: started
     
