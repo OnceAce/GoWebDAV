@@ -1,4 +1,4 @@
-name: Build GoWebDAV
+name: text GoWebDAV
 
 on:
 #  repository_dispatch:
