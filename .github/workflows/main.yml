@@ -10,9 +10,9 @@ on:
 #    types: started
     
 env:
-  UPLOAD_HUB_DOCKER: true
-  UPLOAD_Ali_SH: true
-  UPLOAD_Ali_SZ: true
+  UPLOAD_HUB_DOCKER: false
+  UPLOAD_Ali_SH: false
+  UPLOAD_Ali_SZ: false
   IMAGE-NAME: golang-webdav
   IMAGE-VERSION: latest
 
