@@ -49,9 +49,9 @@ func (c *Config) Load() {
 	WebDAVConfigs := make([]*WebDAVConfig, 0)                  //创建上述格式的结构体
 	
 	for _, davConfig := range davConfigs {                     //通过循环davConfig导出每个用户配置 
-	WebDAVConfigcopy := &WebDAVConfig{}                            
-	WebDAVConfigcopy.InitByConfigStr(davConfig)                //拆分单用户各项配置
-	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfigcopy)    //合并多用户配置
+		WebDAVConfigcopy := &WebDAVConfig{}                            
+		WebDAVConfigcopy.InitByConfigStr(davConfig)                //拆分单用户各项配置
+		WebDAVConfigs = append(WebDAVConfigs, WebDAVConfigcopy)    //合并多用户配置
 	}
 }
 
@@ -87,7 +87,7 @@ func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 	WebDAVConfig.Handler = &webdav.Handler{
 		FileSystem: webdav.Dir(pathDir),
 		LockSystem: webdav.NewMemLS(),
-		Prefix:     davConfigArray[0],
+		Prefix:     WebDAVConfig.prefix,
 	}
 }
 
