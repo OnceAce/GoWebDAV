@@ -27,34 +27,6 @@ type WebDAVConfig struct {     //定义结构体用于区分参数
 	Handler  *webdav.Handler
 }
 
-func (WebDAVConfig *WebDAVConfig) Init(prefix string, pathDir string, username string, password string, readonly bool) {
-	WebDAVConfig.Prefix = prefix
-	WebDAVConfig.PathDir = pathDir
-	WebDAVConfig.Username = username
-	WebDAVConfig.Password = password
-	WebDAVConfig.ReadOnly = readonly
-	WebDAVConfig.Handler = &webdav.Handler{
-		FileSystem: webdav.Dir(pathDir),
-		LockSystem: webdav.NewMemLS(),
-		Prefix:     prefix,
-	}
-}
-func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
-	davConfigArray := strings.Split(str, ",")
-	prefix := davConfigArray[0]
-	pathDir := davConfigArray[1]
-	username := davConfigArray[2]
-	password := davConfigArray[3]
-
-	readonly, err := strconv.ParseBool(davConfigArray[4])
-	if err != nil {
-		readonly = false
-	}
-
-	WebDAVConfig.Init(prefix, pathDir, username, password, readonly)
-}
-
-
 func (c *Config) Load() {
 	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
 	pflag.Parse()
@@ -98,6 +70,40 @@ func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *
 	}
 	return nil
 }
+
+
+
+
+
+func (WebDAVConfig *WebDAVConfig) Init(prefix string, pathDir string, username string, password string, readonly bool) {
+	WebDAVConfig.Prefix = prefix
+	WebDAVConfig.PathDir = pathDir
+	WebDAVConfig.Username = username
+	WebDAVConfig.Password = password
+	WebDAVConfig.ReadOnly = readonly
+	WebDAVConfig.Handler = &webdav.Handler{
+		FileSystem: webdav.Dir(pathDir),
+		LockSystem: webdav.NewMemLS(),
+		Prefix:     prefix,
+	}
+}
+func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
+	davConfigArray := strings.Split(str, ",")
+	prefix := davConfigArray[0]
+	pathDir := davConfigArray[1]
+	username := davConfigArray[2]
+	password := davConfigArray[3]
+
+	readonly, err := strconv.ParseBool(davConfigArray[4])
+	if err != nil {
+		readonly = false
+	}
+
+	WebDAVConfig.Init(prefix, pathDir, username, password, readonly)
+}
+
+
+
 
 
 func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
