@@ -50,8 +50,8 @@ func (c *Config) Load() {
 	
 	for _, davConfig := range davConfigs {                     //通过循环davConfig导出每个用户配置 
 	WebDAVConfigcopy := &WebDAVConfig{}                            
-	WebDAVConfigcopy.InitByConfigStr(davConfig)
-	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfigcopy)
+	WebDAVConfigcopy.InitByConfigStr(davConfig)                //拆分单用户各项配置
+	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfigcopy)    //合并多用户配置
 	}
 }
 
