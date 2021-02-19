@@ -144,7 +144,7 @@ func main() {
 	sMux := http.NewServeMux()
 	sMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 
-		webDAVConfig := model.WebDAVConfigFindOneByPrefix(WebDAVConfigs, parsePrefixFromURL(req.URL))
+		webDAVConfig := WebDAVConfigFindOneByPrefix(WebDAVConfigs, parsePrefixFromURL(req.URL))
 
 		if webDAVConfig == nil {
 
