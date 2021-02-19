@@ -14,11 +14,11 @@ import (
 	"strconv"
 )
 
-type Config struct {
+type Config struct {    //定义结构体用于保存dav外部写入的参数
 	dav string
 }
 
-type WebDAVConfig struct {
+type WebDAVConfig struct {     //定义结构体用于区分参数
 	Prefix   string
 	PathDir  string
 	Username string
@@ -33,7 +33,6 @@ func (WebDAVConfig *WebDAVConfig) Init(prefix string, pathDir string, username s
 	WebDAVConfig.Username = username
 	WebDAVConfig.Password = password
 	WebDAVConfig.ReadOnly = readonly
-
 	WebDAVConfig.Handler = &webdav.Handler{
 		FileSystem: webdav.Dir(pathDir),
 		LockSystem: webdav.NewMemLS(),
