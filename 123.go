@@ -45,6 +45,14 @@ func (c *Config) Load() {
 	
 	c.dav = viper.GetString("dav")          //通过viper从pflag中获取值
 	davConfigs := strings.Split(c.dav, ";")
+	
+	WebDAVConfigs := make([]*WebDAVConfig, 0)
+	
+	for _, davConfig := range davConfigs {
+	WebDAVConfig := &model.WebDAVConfig{}
+	WebDAVConfig.InitByConfigStr(davConfig)
+	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
+	}
 }
 
 var AppConfig *Config = &Config{}
@@ -52,14 +60,6 @@ var AppConfig *Config = &Config{}
 AppConfig.Load()
 fmt.Print("AppConfig.dav ")
 fmt.Println(AppConfig.dav)
-
-WebDAVConfigs := make([]*model.WebDAVConfig, 0)
-
-for _, davConfig := range davConfigs {
-	WebDAVConfig := &model.WebDAVConfig{}
-	WebDAVConfig.InitByConfigStr(davConfig)
-	WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
-}
 
 
 func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *WebDAVConfig {
@@ -70,9 +70,6 @@ func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *
 	}
 	return nil
 }
-
-
-
 
 
 func (WebDAVConfig *WebDAVConfig) Init(prefix string, pathDir string, username string, password string, readonly bool) {
@@ -87,6 +84,8 @@ func (WebDAVConfig *WebDAVConfig) Init(prefix string, pathDir string, username s
 		Prefix:     prefix,
 	}
 }
+
+
 func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 	davConfigArray := strings.Split(str, ",")
 	prefix := davConfigArray[0]
@@ -101,9 +100,6 @@ func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 
 	WebDAVConfig.Init(prefix, pathDir, username, password, readonly)
 }
-
-
-
 
 
 func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
@@ -152,6 +148,8 @@ func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Reques
 	return true
 
 }
+
+
 func main() {
 	sMux := http.NewServeMux()
 	sMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
