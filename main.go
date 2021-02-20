@@ -27,7 +27,7 @@ type WebDAVConfig struct {     //定义结构体用于区分参数
 	Handler  *webdav.Handler
 }
 
-func (c *Config) Load() {
+func (c *Config) Load() WebDAVConfigs []*WebDAVConfig{
 	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
 	pflag.Parse()
 
@@ -57,7 +57,7 @@ func (c *Config) Load() {
 
 var AppConfig *Config = &Config{}
 
-AppConfig.Load()
+AppConfig.Load(WebDAVConfigs)
 fmt.Print("AppConfig.dav ")
 fmt.Println(AppConfig.dav)
 
