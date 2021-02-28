@@ -3,6 +3,7 @@ package main
 import (
 	"GoWebdav/model"
 	"fmt"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"golang.org/x/net/webdav"
@@ -13,73 +14,10 @@ import (
 	"strings"
 )
 
-func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
-	ctx := context.Background()
+var AppConfig = &Config{}
 
-	path := req.URL.Path
-	path = strings.Replace(path, prefix, "/", 1)
-
-	f, err := fs.OpenFile(ctx, path, os.O_RDONLY, 0)
-	if err != nil {
-		return false
-	}
-	defer f.Close()
-
-	if fi, _ := f.Stat(); fi != nil && !fi.IsDir() {
-
-		return false
-
-	}
-
-	dirs, err := f.Readdir(-1)
-
-	if err != nil {
-		log.Print(w, "Error reading directory", http.StatusInternalServerError)
-		return false
-	}
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	_, err = fmt.Fprintf(w, "<pre>\n")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	for _, d := range dirs {
-		name := d.Name()
-		if d.IsDir() {
-			name += "/"
-		}
-		_, err = fmt.Fprintf(w, "<a href=\"%s\" >%s</a>\n", prefix+"/"+path+"/"+name, name)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	_, err = fmt.Fprintf(w, "</pre>\n")
-	if err != nil {
-		fmt.Println(err)
-	}
-	return true
-
-}
 func main() {
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
-
-	AppConfig.Load()
-	fmt.Print("AppConfig.dav ")
-	fmt.Println(AppConfig.dav)
-	davConfigs := strings.Split(AppConfig.dav, ";")
-
-	WebDAVConfigs := make([]*model.WebDAVConfig, 0)
-
-	for _, davConfig := range davConfigs {
-		WebDAVConfig := &model.WebDAVConfig{}
-		WebDAVConfig.InitByConfigStr(davConfig)
-		WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
-	}
+	WebDAVConfigs := AppConfig.Load()
 
 	sMux := http.NewServeMux()
 	sMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
@@ -135,7 +73,7 @@ func main() {
 			}
 		}
 
-		if webDAVConfig.ReadOnly && req.Method != "GET" && req.Method != "OPTIONS" {
+		if webDAVConfig.ReadOnly && req.Method != "GET" && req.Method != "OPTIONS" && req.Method != "PROPFIND"{
 			// ReadOnly
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			_, _ = w.Write([]byte("Readonly, Method " + req.Method + " Not Allowed"))
@@ -151,7 +89,7 @@ func main() {
 		webDAVConfig.Handler.ServeHTTP(w, req)
 	})
 
-	err := http.ListenAndServe(":80", sMux)
+	err := http.ListenAndServe(":8081", sMux)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -162,3 +100,91 @@ func parsePrefixFromURL(url *url.URL) string {
 	u := fmt.Sprint(url)
 	return "/" + strings.Split(u, "/")[1]
 }
+
+
+func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
+	ctx := context.Background()
+
+	path := req.URL.Path
+	path = strings.Replace(path, prefix, "/", 1)
+
+	f, err := fs.OpenFile(ctx, path, os.O_RDONLY, 0)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	if fi, _ := f.Stat(); fi != nil && !fi.IsDir() {
+
+		return false
+
+	}
+
+	dirs, err := f.Readdir(-1)
+
+	if err != nil {
+		log.Print(w, "Error reading directory", http.StatusInternalServerError)
+		return false
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	_, err = fmt.Fprintf(w, "<pre>\n")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for _, d := range dirs {
+		name := d.Name()
+		if d.IsDir() {
+			name += "/"
+		}
+		_, err = fmt.Fprintf(w, "<a href=\"%s\" >%s</a>\n", prefix+"/"+path+"/"+name, name)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	_, err = fmt.Fprintf(w, "</pre>\n")
+	if err != nil {
+		fmt.Println(err)
+	}
+	return true
+}
+
+type Config struct {
+	dav string
+}
+
+func (config *Config) Load() []*model.WebDAVConfig {
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.SetConfigName("config")
+
+	pflag.String("dav", "/dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2", "like /dav1,./TestDir1,user1,pass1;/dav2,./TestDir2,user2,pass2")
+	pflag.Parse()
+
+	err := viper.BindPFlags(pflag.CommandLine)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = viper.ReadInConfig()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Print("AppConfig.dav ")
+	fmt.Println(config.dav)
+
+	config.dav = viper.GetString("dav")
+
+	WebDAVConfigs := make([]*model.WebDAVConfig, 0)
+
+	for _, davConfig := range strings.Split(AppConfig.dav, ";") {
+		WebDAVConfig := &model.WebDAVConfig{}
+		WebDAVConfig.InitByConfigStr(davConfig)
+		WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
+	}
+	return WebDAVConfigs
+}
+
