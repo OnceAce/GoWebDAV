@@ -33,11 +33,3 @@ func (WebDAVConfig *WebDAVConfig) InitByConfigStr(str string) {
 		Prefix:     davConfigArray[0],
 	}
 }
-func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfig, prefix string) *WebDAVConfig {
-	for _, WebDAVConfig := range WebDAVConfigs {
-		if WebDAVConfig.Prefix == prefix {
-			return WebDAVConfig
-		}
-	}
-	return nil
-}
