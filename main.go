@@ -22,7 +22,7 @@ func main() {
 	sMux := http.NewServeMux()
 	sMux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 
-		webDAVConfig := model.WebDAVConfigFindOneByPrefix(WebDAVConfigs, parsePrefixFromURL(req.URL))
+		webDAVConfig := WebDAVConfigFindOneByPrefix(WebDAVConfigs, req.URL)
 
 		if webDAVConfig == nil {
 
@@ -89,17 +89,12 @@ func main() {
 		webDAVConfig.Handler.ServeHTTP(w, req)
 	})
 
-	err := http.ListenAndServe(":80", sMux)
+	err := http.ListenAndServe(":8081", sMux)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-// /dav1/123.txt -> dav1
-func parsePrefixFromURL(url *url.URL) string {
-	u := fmt.Sprint(url)
-	return "/" + strings.Split(u, "/")[1]
-}
 
 
 func handleDirList(fs webdav.FileSystem, w http.ResponseWriter, req *http.Request, prefix string) bool {
@@ -172,11 +167,11 @@ func (config *Config) Load() []*model.WebDAVConfig {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
+
 	config.dav = viper.GetString("dav")
 	fmt.Print("AppConfig.dav ")
 	fmt.Println(config.dav)
-	
+
 	WebDAVConfigs := make([]*model.WebDAVConfig, 0)
 	for _, davConfig := range strings.Split(AppConfig.dav, ";") {
 		WebDAVConfig := &model.WebDAVConfig{}
@@ -186,3 +181,12 @@ func (config *Config) Load() []*model.WebDAVConfig {
 	return WebDAVConfigs
 }
 
+func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*model.WebDAVConfig, url *url.URL) *model.WebDAVConfig {
+	prefix := "/" + strings.Split(fmt.Sprint(url), "/")[1]     //parse Prefix From URL
+	for _, WebDAVConfig := range WebDAVConfigs {
+		if WebDAVConfig.Prefix == prefix {
+			return WebDAVConfig
+		}
+	}
+	return nil
+}
