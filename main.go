@@ -172,14 +172,12 @@ func (config *Config) Load() []*model.WebDAVConfig {
 	if err != nil {
 		fmt.Println(err)
 	}
-
+	
+	config.dav = viper.GetString("dav")
 	fmt.Print("AppConfig.dav ")
 	fmt.Println(config.dav)
-
-	config.dav = viper.GetString("dav")
-
+	
 	WebDAVConfigs := make([]*model.WebDAVConfig, 0)
-
 	for _, davConfig := range strings.Split(AppConfig.dav, ";") {
 		WebDAVConfig := &model.WebDAVConfig{}
 		WebDAVConfig.InitByConfigStr(davConfig)
