@@ -89,7 +89,7 @@ func main() {
 		webDAVConfig.Handler.ServeHTTP(w, req)
 	})
 
-	err := http.ListenAndServe(":8081", sMux)
+	err := http.ListenAndServe(":80", sMux)
 	if err != nil {
 		fmt.Println(err)
 	}
