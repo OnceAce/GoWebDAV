@@ -1,7 +1,6 @@
 package main
 
 import (
-	"GoWebdav/model"
 	"fmt"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -11,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -151,7 +151,16 @@ type Config struct {
 	dav string
 }
 
-func (config *Config) Load() []*model.WebDAVConfig {
+type WebDAVConfigure struct {
+	Prefix   string
+	PathDir  string
+	Username string
+	Password string
+	ReadOnly bool
+	Handler  *webdav.Handler
+}
+
+func (config *Config) Load() []*WebDAVConfigure {
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
@@ -172,16 +181,40 @@ func (config *Config) Load() []*model.WebDAVConfig {
 	fmt.Print("AppConfig.dav ")
 	fmt.Println(config.dav)
 
-	WebDAVConfigs := make([]*model.WebDAVConfig, 0)
-	for _, davConfig := range strings.Split(AppConfig.dav, ";") {
-		WebDAVConfig := &model.WebDAVConfig{}
-		WebDAVConfig.InitByConfigStr(davConfig)
+	WebDAVConfigs := InitByConfigStr(config.dav)
+	return WebDAVConfigs
+
+
+}
+
+func InitByConfigStr (str string) []*WebDAVConfigure {
+	WebDAVConfigs := make([]*WebDAVConfigure, 0)
+	for _, davConfig := range strings.Split(str, ";") {
+		WebDAVConfig := &WebDAVConfigure{}
+		davConfigArray := strings.Split(davConfig, ",")
+		WebDAVConfig.Prefix = davConfigArray[0]
+		WebDAVConfig.PathDir = davConfigArray[1]
+		WebDAVConfig.Username = davConfigArray[2]
+		WebDAVConfig.Password = davConfigArray[3]
+
+		readonly, err := strconv.ParseBool(davConfigArray[4])
+		if err != nil {
+			readonly = false
+		}
+
+		WebDAVConfig.ReadOnly = readonly
+		WebDAVConfig.Handler = &webdav.Handler{
+			FileSystem: webdav.Dir(davConfigArray[1]),
+			LockSystem: webdav.NewMemLS(),
+			Prefix:     davConfigArray[0],
+		}
+
 		WebDAVConfigs = append(WebDAVConfigs, WebDAVConfig)
 	}
 	return WebDAVConfigs
 }
 
-func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*model.WebDAVConfig, url *url.URL) *model.WebDAVConfig {
+func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*WebDAVConfigure, url *url.URL) *WebDAVConfigure {
 	prefix := "/" + strings.Split(fmt.Sprint(url), "/")[1]     //parse Prefix From URL
 	for _, WebDAVConfig := range WebDAVConfigs {
 		if WebDAVConfig.Prefix == prefix {
@@ -190,3 +223,7 @@ func WebDAVConfigFindOneByPrefix(WebDAVConfigs []*model.WebDAVConfig, url *url.U
 	}
 	return nil
 }
+
+
+
+
