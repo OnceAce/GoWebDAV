@@ -89,7 +89,7 @@ func main() {
 		webDAVConfig.Handler.ServeHTTP(w, req)
 	})
 
-	err := http.ListenAndServe(":8081", sMux)
+	err := http.ListenAndServe(":80", sMux)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -181,13 +181,13 @@ func (config *Config) Load() []*WebDAVConfigure {
 	fmt.Print("AppConfig.dav ")
 	fmt.Println(config.dav)
 
-	WebDAVConfigs := InitByConfigStr(config.dav)
+	WebDAVConfigs := ParseInitialConfig(config.dav)
 	return WebDAVConfigs
 
 
 }
 
-func InitByConfigStr (str string) []*WebDAVConfigure {
+func ParseInitialConfig (str string) []*WebDAVConfigure {
 	WebDAVConfigs := make([]*WebDAVConfigure, 0)
 	for _, davConfig := range strings.Split(str, ";") {
 		WebDAVConfig := &WebDAVConfigure{}
